@@ -3,6 +3,12 @@ export const INITIAL_SPEED = 150;
 export const SPEED_INCREMENT = 2; // Decrease speed (ms) per food eaten
 export const MIN_SPEED = 50;
 
+export const GAME_SPEEDS = {
+    SLOW: { label: 'Slow', value: 200 },
+    MEDIUM: { label: 'Medium', value: 150 },
+    FAST: { label: 'Fast', value: 100 },
+};
+
 export const DIRECTIONS = {
     UP: { x: 0, y: -1 },
     DOWN: { x: 0, y: 1 },

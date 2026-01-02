@@ -4,6 +4,7 @@ import Board from './components/Board';
 import ScoreBoard from './components/ScoreBoard';
 import GameOverModal from './components/GameOverModal';
 import Controls from './components/Controls';
+import SpeedControl from './components/SpeedControl';
 import { Pause } from 'lucide-react';
 
 function App() {
@@ -15,6 +16,8 @@ function App() {
         highScore,
         isGameOver,
         isPaused,
+        difficulty,
+        changeDifficulty,
         resetGame,
         startGame // Actually used to start/unpause if needed, but we auto-start logic handled in hook state
     } = useSnakeGame();
@@ -37,12 +40,19 @@ function App() {
                     isGameOver={isGameOver}
                 />
 
-                <div className="h-6">
-                    {isPaused && !isGameOver && (
+                <div className="h-6 flex items-center justify-center w-full">
+                    {isPaused && !isGameOver ? (
                         <div className="flex items-center gap-2 text-amber-400 animate-pulse">
                             <Pause size={20} fill="currentColor" />
                             <span className="font-bold tracking-widest">PAUSED</span>
                         </div>
+                    ) : (
+                        /* Show Speed Controls when not paused (and implicitly not game over due to parent checks usually, but let's just show it always or mainly when playing/idle) */
+                        <SpeedControl
+                            currentDifficulty={difficulty}
+                            onDifficultyChange={changeDifficulty}
+                            disabled={isGameOver}
+                        />
                     )}
                 </div>
             </div>

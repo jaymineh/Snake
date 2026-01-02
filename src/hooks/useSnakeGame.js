@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { BOARD_SIZE, DIRECTIONS, INITIAL_SNAKE, INITIAL_SPEED, CONTROLS, SPEED_INCREMENT, MIN_SPEED } from '../utils/constants';
+import { BOARD_SIZE, DIRECTIONS, INITIAL_SNAKE, INITIAL_SPEED, CONTROLS, SPEED_INCREMENT, MIN_SPEED, GAME_SPEEDS } from '../utils/constants';
 import { useGameLoop } from './useGameLoop';
 import { getHighScore, saveHighScore } from '../utils/storage';
 
@@ -22,8 +22,11 @@ export function useSnakeGame() {
     const [food, setFood] = useState({ x: 5, y: 5 });
     const [direction, setDirection] = useState(DIRECTIONS.UP);
     const [nextDirection, setNextDirection] = useState(DIRECTIONS.UP);
-    // Start with INITIAL_SPEED to auto-start
-    const [speed, setSpeed] = useState(INITIAL_SPEED);
+
+    // Difficulty / Speed State
+    const [difficulty, setDifficulty] = useState(GAME_SPEEDS.MEDIUM);
+    const [speed, setSpeed] = useState(GAME_SPEEDS.MEDIUM.value);
+
     const [score, setScore] = useState(0);
     const [highScore, setHighScore] = useState(getHighScore());
     const [isGameOver, setIsGameOver] = useState(false);
@@ -33,16 +36,29 @@ export function useSnakeGame() {
         setFood(generateFood(INITIAL_SNAKE));
     }, []);
 
+    // Update speed when difficulty changes (only if game hasn't started moving / score is 0, or just let user restart)
+    // For simplicity, we'll let the user change difficulty but it applies on next reset/start unless we add a specific handler.
+    // Actually, let's allow changing difficulty which updates current speed if not paused/gameover
+    const changeDifficulty = useCallback((newDifficulty) => {
+        setDifficulty(newDifficulty);
+        if (!isGameOver && !isPaused) {
+            setSpeed(newDifficulty.value);
+            // Note: This resets any speed increments from eating food. 
+            // Ideally difficulty sets the BASE speed. 
+            // For this simple implementation, changing difficulty mid-game resets speed progress.
+        }
+    }, [isGameOver, isPaused]);
+
     const resetGame = useCallback(() => {
         setSnake(INITIAL_SNAKE);
         setDirection(DIRECTIONS.UP);
         setNextDirection(DIRECTIONS.UP);
         setScore(0);
-        setSpeed(INITIAL_SPEED);
+        setSpeed(difficulty.value);
         setIsGameOver(false);
         setIsPaused(false);
         setFood(generateFood(INITIAL_SNAKE));
-    }, []);
+    }, [difficulty]);
 
     const stopGame = useCallback(() => {
         setSpeed(null);
@@ -106,7 +122,14 @@ export function useSnakeGame() {
                     setIsPaused(prev => {
                         const paused = !prev;
                         // Resume speed from pause
-                        setSpeed(paused ? null : Math.max(MIN_SPEED, INITIAL_SPEED - (score / 10 * SPEED_INCREMENT)));
+                        // We need to calculate current speed based on score or just save it.
+                        // For now, let's just resume to difficulty value minus increments
+                        if (!paused) {
+                            const currentSpeed = Math.max(MIN_SPEED, difficulty.value - (score / 10 * SPEED_INCREMENT));
+                            setSpeed(currentSpeed);
+                        } else {
+                            setSpeed(null);
+                        }
                         return paused;
                     });
                 }
@@ -127,7 +150,7 @@ export function useSnakeGame() {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [direction, isGameOver, score]);
+    }, [direction, isGameOver, score, difficulty]); // Added difficulty dependency
 
     return {
         snake,
@@ -137,7 +160,9 @@ export function useSnakeGame() {
         isGameOver,
         isPaused,
         direction,
+        difficulty,
+        changeDifficulty,
         resetGame,
-        startGame: () => setSpeed(INITIAL_SPEED),
+        startGame: () => setSpeed(difficulty.value),
     };
 }
