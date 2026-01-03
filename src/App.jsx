@@ -5,6 +5,7 @@ import ScoreBoard from './components/ScoreBoard';
 import GameOverModal from './components/GameOverModal';
 import Controls from './components/Controls';
 import SpeedControl from './components/SpeedControl';
+import PassthroughToggle from './components/PassthroughToggle';
 import { Pause } from 'lucide-react';
 
 function App() {
@@ -19,7 +20,9 @@ function App() {
         difficulty,
         changeDifficulty,
         resetGame,
-        startGame // Actually used to start/unpause if needed, but we auto-start logic handled in hook state
+        startGame, // Actually used to start/unpause if needed, but we auto-start logic handled in hook state
+        isPassthrough,
+        togglePassthrough
     } = useSnakeGame();
 
     return (
@@ -48,11 +51,19 @@ function App() {
                         </div>
                     ) : (
                         /* Show Speed Controls when not paused (and implicitly not game over due to parent checks usually, but let's just show it always or mainly when playing/idle) */
-                        <SpeedControl
-                            currentDifficulty={difficulty}
-                            onDifficultyChange={changeDifficulty}
-                            disabled={isGameOver}
-                        />
+                        <div className="flex items-center gap-4">
+                            <SpeedControl
+                                currentDifficulty={difficulty}
+                                onDifficultyChange={changeDifficulty}
+                                disabled={isGameOver}
+                            />
+                            <div className="w-px h-8 bg-slate-800" />
+                            <PassthroughToggle
+                                isPassthrough={isPassthrough}
+                                onToggle={togglePassthrough}
+                                disabled={isGameOver}
+                            />
+                        </div>
                     )}
                 </div>
             </div>

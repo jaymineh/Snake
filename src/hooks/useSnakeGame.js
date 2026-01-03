@@ -26,6 +26,7 @@ export function useSnakeGame() {
     // Difficulty / Speed State
     const [difficulty, setDifficulty] = useState(GAME_SPEEDS.MEDIUM);
     const [speed, setSpeed] = useState(GAME_SPEEDS.MEDIUM.value);
+    const [isPassthrough, setIsPassthrough] = useState(false);
 
     const [score, setScore] = useState(0);
     const [highScore, setHighScore] = useState(getHighScore());
@@ -60,6 +61,10 @@ export function useSnakeGame() {
         setFood(generateFood(INITIAL_SNAKE));
     }, [difficulty]);
 
+    const togglePassthrough = useCallback(() => {
+        setIsPassthrough(prev => !prev);
+    }, []);
+
     const stopGame = useCallback(() => {
         setSpeed(null);
         setIsGameOver(true);
@@ -78,14 +83,23 @@ export function useSnakeGame() {
             };
 
             // Check Walls
-            if (
-                newHead.x < 0 ||
-                newHead.x >= BOARD_SIZE ||
-                newHead.y < 0 ||
-                newHead.y >= BOARD_SIZE
-            ) {
-                stopGame();
-                return prevSnake;
+            // Check Walls
+            if (isPassthrough) {
+                // Wrap around
+                if (newHead.x < 0) newHead.x = BOARD_SIZE - 1;
+                if (newHead.x >= BOARD_SIZE) newHead.x = 0;
+                if (newHead.y < 0) newHead.y = BOARD_SIZE - 1;
+                if (newHead.y >= BOARD_SIZE) newHead.y = 0;
+            } else {
+                if (
+                    newHead.x < 0 ||
+                    newHead.x >= BOARD_SIZE ||
+                    newHead.y < 0 ||
+                    newHead.y >= BOARD_SIZE
+                ) {
+                    stopGame();
+                    return prevSnake;
+                }
             }
 
             // Check Self Collision
@@ -164,5 +178,7 @@ export function useSnakeGame() {
         changeDifficulty,
         resetGame,
         startGame: () => setSpeed(difficulty.value),
+        isPassthrough,
+        togglePassthrough,
     };
 }
