@@ -16,6 +16,7 @@ A modern, visually stunning implementation of the classic Snake game built with 
   - **Fast**: High-speed challenge (100ms)
 - **Responsive Controls**: Support for both WASD and Arrow keys.
 - **Score Tracking**: Real-time score and high score persistence.
+- **Passthrough Mode (Ghost Mode)**: Toggleable option to wrap around walls instead of crashing.
 
 ## 🛠 Prerequisites
 
@@ -55,8 +56,9 @@ If you prefer using the command line:
 - **Arrow Keys** or **WASD** to move.
 - **Space** to Pause/Resume.
 - Eat the **Apples** to grow and earn points.
-- Avoid hitting the walls or yourself!
+- Avoid hitting the walls or yourself (unless Ghost Mode is ON!).
 - Select **Difficulty** at the bottom of the screen to change game speed.
+- Toggle **Ghost Mode** to enable/disable wall wrapping.
 
 ## 💻 Tech Stack
 
