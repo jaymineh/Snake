@@ -51,6 +51,22 @@ If you prefer using the command line:
 
 3. Open your browser and visit `http://localhost:5173`
 
+### Docker Setup 🐳
+
+You can also run the game using Docker:
+
+1. Build and start the container:
+   ```bash
+   docker-compose up -d --build
+   ```
+
+2. Open your browser and visit `http://localhost:8080`
+
+3. To stop the container:
+   ```bash
+   docker-compose down
+   ```
+
 ## 🎮 How to Play
 
 - **Arrow Keys** or **WASD** to move.
